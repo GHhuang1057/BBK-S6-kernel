@@ -46,4 +46,14 @@ make -j$(nproc) Image REAL_CC=$CC CLANG_TRIPLE=aarch64-linux-gnu-
 ## 构建产物
 
 - `arch/arm64/boot/Image` — 编译好的内核镜像（已含触控+fbcon）
+- `boot.img` — 可刷 boot 分区镜像
+- `recovery.img` — 可刷 recovery 分区镜像（TWRP 验证）
 - 刷入方式：见 [BUILDING.md](BUILDING.md) 或 TWRP 内 `dd` 到 recovery 分区
+
+## 方法学（给 AI Agent / 逆向工程师）
+
+本项目是从闭源厂商 boot.img 逆向重建内核源码的**完整实战案例**。
+整套方法论、工具链、坑位记录见 [WORKFLOW.md](WORKFLOW.md) —— 可复用于其他
+闭源厂商内核（BBK/vivo/OPPO/realme 等）的逆向重建。
+
+核心流程：`解包→提config/符号→匹配CAF基线→符号diff定位厂商代码→Ghidra逆向→旧工具链编译→原地替换打包→真机验证`
