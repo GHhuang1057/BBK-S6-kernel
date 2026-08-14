@@ -25,6 +25,8 @@ dts-dirs += xilinx
 dts-dirs += lg
 dts-dirs += zte
 
+dts-dirs += eebbk-qcom
+
 subdir-y	:= $(dts-dirs)
 
 dtstree		:= $(srctree)/$(src)
