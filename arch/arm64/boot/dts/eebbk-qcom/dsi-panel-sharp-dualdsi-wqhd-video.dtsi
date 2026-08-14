@@ -1,0 +1,79 @@
+/* Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&mdss_mdp {
+	dsi_dual_sharp_wqhd_video: qcom,mdss_dsi_sharp_wqhd_video {
+	// BBK_VENDOR_EDIT
+		qcom,mdss-dsi-panel-name = "Dual Sharp wqhd video mode dsi panel";
+		qcom,mdss-dsi-panel-type = "dsi_video_mode";
+		qcom,mdss-dsi-virtual-channel-id = <0x00>;
+		qcom,mdss-dsi-stream = <0x00>;
+		qcom,mdss-dsi-bpp = <0x18>;
+		qcom,mdss-dsi-border-color = <0x00>;
+		qcom,mdss-dsi-h-sync-pulse = <0x00>;
+		qcom,mdss-dsi-traffic-mode = "burst_mode";
+		qcom,mdss-dsi-bllp-eof-power-mode;
+		qcom,mdss-dsi-bllp-power-mode;
+		qcom,mdss-dsi-lane-0-state;
+		qcom,mdss-dsi-lane-1-state;
+		qcom,mdss-dsi-lane-2-state;
+		qcom,mdss-dsi-lane-3-state;
+		qcom,mdss-dsi-dma-trigger = "trigger_sw";
+		qcom,mdss-dsi-mdp-trigger = "none";
+		qcom,mdss-dsi-reset-sequence = <0x01 0x14 0x00 0x14 0x01 0x14>;
+		qcom,mdss-dsi-tx-eot-append;
+		qcom,mdss-pan-physical-width-dimension = <0x93>;
+		qcom,mdss-pan-physical-height-dimension = <0xc5>;
+		qcom,adjust-timer-wakeup-ms = <0x01>;
+		qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_pwm";
+		qcom,mdss-dsi-t-clk-post = <0x0c>;
+		qcom,mdss-dsi-t-clk-pre = <0x29>;
+		qcom,esd-check-enabled;
+		qcom,mdss-dsi-panel-status-check-mode = "reg_read";
+		qcom,mdss-dsi-panel-status-command = <0x6010001 0x10a 0x6010001 0x10d 0x6010001 0x10e 0x6010001 0x1ac>;
+		qcom,mdss-dsi-panel-status-command-state = "dsi_lp_mode";
+		qcom,mdss-dsi-panel-status-value = <0x9c 0x00 0x00 0x00>;
+		qcom,mdss-dsi-panel-status-read-length = <0x01 0x01 0x01 0x01>;
+		qcom,dsi-supported-dfps-list = <0x3c 0x3b>;
+		qcom,bl-pmic-pwm-period-usecs = <0xc8>;
+		qcom,mdss-dsi-bl-min-level = <0x01>;
+		qcom,mdss-dsi-bl-max-level = <0xff>;
+		qcom,mdss-dsi-bl-default-level = <0x46>;
+		qcom,mdss-brightness-max-level = <0xff>;
+		qcom,mdss-dsi-mode-sel-gpio-state = "dual_port";
+		
+		qcom,mdss-dsi-display-timings {
+
+			timing@0 {
+				qcom,mdss-dsi-panel-width = <0x320>;
+				qcom,mdss-dsi-panel-height = <0x880>;
+				qcom,mdss-dsi-h-front-porch = <0x06>;
+				qcom,mdss-dsi-h-back-porch = <0x10>;
+				qcom,mdss-dsi-h-pulse-width = <0x05>;
+				qcom,mdss-dsi-h-sync-skew = <0x00>;
+				qcom,mdss-dsi-v-back-porch = <0x22>;
+				qcom,mdss-dsi-v-front-porch = <0xff>;
+				qcom,mdss-dsi-v-pulse-width = <0x06>;
+				qcom,mdss-dsi-panel-framerate = <0x3c>;
+				qcom,mdss-dsi-on-command = [29 01 00 00 00 00 02 00 00 29 01 00 00 00 00 03 99 95 27 05 01 00 00 78 00 01 11 05 01 00 00 01 00 01 29 29 01 00 00 00 00 02 00 00 29 01 00 00 00 00 03 99 00 00];
+				qcom,mdss-dsi-off-command = [29 01 00 00 00 00 02 00 00 29 01 00 00 00 00 03 99 95 27 05 01 00 00 01 00 02 28 00 05 01 00 00 78 00 02 10 00];
+				qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
+				qcom,mdss-dsi-off-command-state = "dsi_lp_mode";
+				qcom,mdss-dsi-panel-phy-timings = <0x1a0606 0x22200707 0x4020400>;
+				qcom,display-topology = <0x02 0x00 0x02>;
+				qcom,default-topology-index = <0x00>;
+			};
+		};
+		// BBK_VENDOR_EDIT
+	};
+};
+
