@@ -28,7 +28,7 @@
 #include "../wcd-mbhc-v2-api.h"
 #include "internal.h"
 
-#define WCD937X_ZDET_SUPPORTED          true
+#define WCD937X_ZDET_SUPPORTED          false
 /* Z value defined in milliohm */
 #define WCD937X_ZDET_VAL_32             32000
 #define WCD937X_ZDET_VAL_400            400000
