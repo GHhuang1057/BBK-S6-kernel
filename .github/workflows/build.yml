@@ -84,16 +84,9 @@ jobs:
           name: Image-gz-4.14
           path: workdir/source/out/arch/arm64/boot/Image.gz
 
-      - name: Upload Image file
+      - name: Upload dtbs file
         if: env.CHECK_FILE_IS_OK == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: Image-gz-4.14
+          name: dtbs-4.14
           path: workdir/source/out/arch/arm64/boot/dts/eebbk-qcom/sdmmagpie*
-
-      - name: Upload kernel file
-        if: env.CHECK_FILE_IS_OK == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: Image-gz-dtb-4.14
-          path: workdir/source/out/arch/arm64/boot/Image.gz-dtb

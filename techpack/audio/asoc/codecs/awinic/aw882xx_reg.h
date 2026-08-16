@@ -1530,8 +1530,6 @@ static const unsigned char aw882xx_reg_access[AW882XX_REG_MAX] = {
 #define AW882XX_VOL_DEFAULT				\
 	(AW882XX_VOL_DEFAULT_VALUE<<AW882XX_VOL_START_BIT)
 
-#define AW882XX_VOL_6DB_STEP		(6 * 2)
-
 /* HOLDTH bit 7:0 (HAGCCFG4 0x0C) */
 #define AW882XX_HOLDTH_START_BIT		(0)
 #define AW882XX_HOLDTH_BITS_LEN			(8)
@@ -1550,12 +1548,6 @@ static const unsigned char aw882xx_reg_access[AW882XX_REG_MAX] = {
 /* #define  AW882XX_HAGCCFG4_DEFAULT		(0x0064) */
 
 /* #define  AW882XX_TESTDET_DEFAULT		(0x0000) */
-
-
-#define AW882XX_DITHER_EN_START_BIT		(7)
-#define AW882XX_DITHER_EN_BITS_LEN		(1)
-#define AW882XX_DITHER_EN_MASK				\
-	(~(((1<<AW882XX_DITHER_EN_BITS_LEN)-1)<<AW882XX_DITHER_EN_START_BIT))
 
 
 /********************************************
