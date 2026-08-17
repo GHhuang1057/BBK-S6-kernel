@@ -667,9 +667,9 @@
 
 		ramoops: ramoops@a2100000 {
 			compatible = "ramoops";
-			reg = <0x00 0xa2100000 0x00 0x80000>;
+			reg = <0x00 0xa2100000 0x00 0x140000>;
 			record-size = <0x20000>;
-			console-size = <0x20000>;
+			console-size = <0x100000>;
 			pmsg-size = <0x20000>;
 		};
         // Add ramoops and minirdump
