@@ -288,6 +288,19 @@ static void halt_spmi_pmic_arbiter(void)
 static void msm_restart_prepare(const char *cmd)
 {
 	bool need_warm_reset = false;
+	
+#ifdef CONFIG_QCOM_DLOAD_MODE
+    if (in_panic) {
+        pr_info("PANIC: force recovery, EDL disabled\n");
+        set_dload_mode(0);
+        qpnp_pon_set_restart_reason(PON_RESTART_REASON_RECOVERY);
+        __raw_writel(0x77665502, restart_reason);
+        qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);  // 直接执行 warm reset
+        flush_cache_all();
+        return;   // 直接返回，不再执行后面任何代码
+    }
+#endif
+	
 #ifdef CONFIG_QCOM_DLOAD_MODE
 	/* Write download mode flags if we're panic'ing
 	 * Write download mode flags if restart_mode says so
@@ -295,7 +308,7 @@ static void msm_restart_prepare(const char *cmd)
 	 */
 	if (!is_kdump_kernel())
 		set_dload_mode(download_mode &&
-			(in_panic || restart_mode == RESTART_DLOAD));
+			(restart_mode == RESTART_DLOAD));
 #endif
 
 	if (qpnp_pon_check_hard_reset_stored()) {
@@ -318,6 +331,7 @@ static void msm_restart_prepare(const char *cmd)
 	else
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_HARD_RESET);
 
+#if 0
 	if (cmd != NULL) {
 		if (!strncmp(cmd, "bootloader", 10)) {
 			qpnp_pon_set_restart_reason(
@@ -357,9 +371,9 @@ static void msm_restart_prepare(const char *cmd)
 			__raw_writel(0x77665501, restart_reason);
 		}
 	}
+#endif
 
 	flush_cache_all();
-
 	/*outer_flush_all is not supported by 64bit kernel*/
 #ifndef CONFIG_ARM64
 	outer_flush_all();
