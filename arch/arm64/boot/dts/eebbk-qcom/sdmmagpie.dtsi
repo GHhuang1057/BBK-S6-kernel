@@ -634,7 +634,7 @@
 			reusable;
 			alignment = <0 0x400000>;
 			// BBK_VENDOR_EDIT
-			size = <0 0x8c00000>;
+			size = <0 0x5c00000>;
 			// 0x8c00000 > 0x5c00000
 		};
 
