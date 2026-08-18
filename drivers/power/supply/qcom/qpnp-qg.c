@@ -2086,8 +2086,12 @@ static int qg_psy_get_property(struct power_supply *psy,
 		rc = qg_sdam_read(SDAM_OCV_UV, &pval->intval);
 		break;
 	case POWER_SUPPLY_PROP_TEMP:
-		rc = qg_get_battery_temp(chip, &pval->intval);
-		break;
+    /* TEMP WORKAROUND: 绕过电池温度误报，固定返回 25.0°C */
+        pval->intval = 250;
+        rc = 0;
+        // 保留原代码
+        // rc = qg_get_battery_temp(chip, &pval->intval);
+        break;
 	case POWER_SUPPLY_PROP_RESISTANCE_ID:
 		pval->intval = chip->batt_id_ohm;
 		break;
