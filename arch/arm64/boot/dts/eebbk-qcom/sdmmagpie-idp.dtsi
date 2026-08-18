@@ -160,7 +160,7 @@
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,platform-te-gpio = <&tlmm 10 0>;
 	qcom,platform-reset-gpio = <&pm6150l_gpios 9 0>;
-	qcom,platform-en-gpio = <&pm6150l_gpios 4 0>;
+	// qcom,platform-en-gpio = <&pm6150l_gpios 4 0>;
 	qcom,platform-bklight-en-gpio = <&pm6150l_gpios 5 0>;
 	qcom,platform-enp-gpio = <&tlmm 0x40 0x00>;
 	qcom,platform-enn-gpio = <&tlmm 0x41 0x00>;
