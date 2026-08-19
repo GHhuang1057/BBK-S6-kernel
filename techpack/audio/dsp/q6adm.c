@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2021 XiaoMi, Inc.
  * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -68,7 +69,6 @@ struct adm_copp {
 	atomic_t channels[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
 	atomic_t app_type[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
 	atomic_t acdb_id[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
-	atomic_t session_type[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
 	wait_queue_head_t wait[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
 	wait_queue_head_t adm_delay_wait[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
 	atomic_t adm_delay_stat[AFE_MAX_PORTS][MAX_COPPS_PER_PORT];
@@ -279,8 +279,7 @@ static int adm_get_copp_id(int port_idx, int copp_idx)
 }
 
 static int adm_get_idx_if_copp_exists(int port_idx, int topology, int mode,
-				 int rate, int bit_width, int app_type,
-				 int session_type)
+				 int rate, int bit_width, int app_type)
 {
 	int idx;
 
@@ -294,9 +293,6 @@ static int adm_get_idx_if_copp_exists(int port_idx, int topology, int mode,
 		    (rate == atomic_read(&this_adm.copp.rate[port_idx][idx])) &&
 		    (bit_width ==
 			atomic_read(&this_adm.copp.bit_width[port_idx][idx])) &&
-			(session_type ==
-			atomic_read(
-				&this_adm.copp.session_type[port_idx][idx])) &&
 		    (app_type ==
 			atomic_read(&this_adm.copp.app_type[port_idx][idx])))
 			return idx;
@@ -1533,8 +1529,6 @@ static void adm_reset_data(void)
 			    &this_adm.copp.app_type[i][j], 0);
 			atomic_set(
 			   &this_adm.copp.acdb_id[i][j], 0);
-			atomic_set(
-				&this_adm.copp.session_type[i][j], 0);
 			this_adm.copp.adm_status[i][j] =
 				ADM_STATUS_CALIBRATION_REQUIRED;
 		}
@@ -2180,8 +2174,7 @@ static struct cal_block_data *adm_find_cal_by_path(int cal_index, int path)
 
 		if (cal_index == ADM_AUDPROC_CAL ||
 		    cal_index == ADM_LSM_AUDPROC_CAL ||
-		    cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL ||
-		    cal_index == ADM_AUDPROC_PERSISTENT_CAL) {
+		    cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL) {
 			audproc_cal_info = cal_block->cal_info;
 			if ((audproc_cal_info->path == path) &&
 			    (cal_block->cal_data.size > 0))
@@ -2219,8 +2212,7 @@ static struct cal_block_data *adm_find_cal_by_app_type(int cal_index, int path,
 
 		if (cal_index == ADM_AUDPROC_CAL ||
 		    cal_index == ADM_LSM_AUDPROC_CAL ||
-		    cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL ||
-		    cal_index == ADM_AUDPROC_PERSISTENT_CAL) {
+		    cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL) {
 			audproc_cal_info = cal_block->cal_info;
 			if ((audproc_cal_info->path == path) &&
 			    (audproc_cal_info->app_type == app_type) &&
@@ -2261,8 +2253,7 @@ static struct cal_block_data *adm_find_cal(int cal_index, int path,
 
 		if (cal_index == ADM_AUDPROC_CAL ||
 		    cal_index == ADM_LSM_AUDPROC_CAL ||
-		    cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL||
-		    cal_index == ADM_AUDPROC_PERSISTENT_CAL) {
+		    cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL) {
 			audproc_cal_info = cal_block->cal_info;
 			if ((audproc_cal_info->path == path) &&
 			    (audproc_cal_info->app_type == app_type) &&
@@ -2353,9 +2344,6 @@ static void send_adm_cal(int port_id, int copp_idx, int path, int perf_mode,
 	if (passthr_mode != LISTEN) {
 		send_adm_cal_type(ADM_AUDPROC_CAL, path, port_id, copp_idx,
 				perf_mode, app_type, acdb_id, sample_rate);
-		send_adm_cal_type(ADM_AUDPROC_PERSISTENT_CAL, path,
-				  port_id, copp_idx, perf_mode, app_type,
-				  acdb_id, sample_rate);
 	} else {
 		send_adm_cal_type(ADM_LSM_AUDPROC_CAL, path, port_id, copp_idx,
 				  perf_mode, app_type, acdb_id, sample_rate);
@@ -2842,10 +2830,8 @@ static int adm_arrange_mch_ep2_map_v8(
  *
  * Returns 0 on success or error on failure
  */
-#define VOICE_TOPOLOGY_LVIMFQ_TX_DM    0x1000BFF5
 int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
-	     int perf_mode, uint16_t bit_width, int app_type, int acdb_id,
-	     int session_type)
+	     int perf_mode, uint16_t bit_width, int app_type, int acdb_id)
 {
 	struct adm_cmd_device_open_v5	open;
 	struct adm_cmd_device_open_v6	open_v6;
@@ -2861,9 +2847,9 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 	void *adm_params = NULL;
 	int param_size;
 
-	pr_debug("%s:port %#x path:%d rate:%d mode:%d perf_mode:%d,topo_id %d\n",
-		 __func__, port_id, path, rate, channel_mode, perf_mode,
-		 topology);
+	pr_info("%s:port %#x path:%d rate:%d mode:%d perf_mode:%d,topo_id 0x%x bit_width %d app_type %d acdb_id %d\n",
+		__func__, port_id, path, rate, channel_mode, perf_mode,
+			 topology, bit_width, app_type, acdb_id);
 
 	port_id = q6audio_convert_virtual_to_portid(port_id);
 	port_idx = adm_validate_and_get_port_index(port_id);
@@ -2928,21 +2914,18 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 			rate = 16000;
 	}
 
-	if ((topology == VOICE_TOPOLOGY_LVIMFQ_TX_DM)
-		&& (rate != ADM_CMD_COPP_OPEN_SAMPLE_RATE_48K)) {
-		pr_info("%s: Change rate %d to 48K for copp 0x%x",
-			__func__, rate, topology);
-		rate = 48000;
-	}
-
 	if (topology == FFECNS_TOPOLOGY) {
 		this_adm.ffecns_port_id = port_id;
 		pr_debug("%s: ffecns port id =%x\n", __func__,
 				this_adm.ffecns_port_id);
 	}
 
-	if (topology == VPM_TX_VOICE_SMECNS_V2_COPP_TOPOLOGY)
+	if (topology == VPM_TX_VOICE_SMECNS_V2_COPP_TOPOLOGY ||
+		topology == ADM_TOPOLOGY_ID_AUDIO_RX_FVSAM) {
+		pr_debug("%s: set channel_mode as 1 for topology=%d\n", __func__, topology);
 		channel_mode = 1;
+	}
+
 
 	/*
 	 * Routing driver reuses the same adm for streams with the same
@@ -2953,7 +2936,7 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 		copp_idx = adm_get_idx_if_copp_exists(port_idx, topology,
 						      perf_mode,
 						      rate, bit_width,
-						      app_type, session_type);
+						      app_type);
 
 	if (copp_idx < 0) {
 		copp_idx = adm_get_next_available_copp(port_idx);
@@ -2977,8 +2960,6 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 			   app_type);
 		atomic_set(&this_adm.copp.acdb_id[port_idx][copp_idx],
 			   acdb_id);
-		atomic_set(&this_adm.copp.session_type[port_idx][copp_idx],
-			session_type);
 		set_bit(ADM_STATUS_CALIBRATION_REQUIRED,
 		(void *)&this_adm.copp.adm_status[port_idx][copp_idx]);
 		if ((path != ADM_PATH_COMPRESSED_RX) &&
@@ -3158,8 +3139,7 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 			open.endpoint_id_1 = tmp_port;
 			open.endpoint_id_2 = 0xFFFF;
 
-			if (this_adm.ec_ref_rx && (path != 1) &&
-				(afe_get_port_type(tmp_port) == MSM_AFE_PORT_TYPE_TX)) {
+			if (this_adm.ec_ref_rx && (path != 1)) {
 				open.endpoint_id_2 = this_adm.ec_ref_rx;
 			}
 
@@ -3687,7 +3667,6 @@ int adm_close(int port_id, int perf_mode, int copp_idx)
 		atomic_set(&this_adm.copp.channels[port_idx][copp_idx], 0);
 		atomic_set(&this_adm.copp.bit_width[port_idx][copp_idx], 0);
 		atomic_set(&this_adm.copp.app_type[port_idx][copp_idx], 0);
-		atomic_set(&this_adm.copp.session_type[port_idx][copp_idx], 0);
 
 		clear_bit(ADM_STATUS_CALIBRATION_REQUIRED,
 			(void *)&this_adm.copp.adm_status[port_idx][copp_idx]);
@@ -3923,9 +3902,6 @@ static int get_cal_type_index(int32_t cal_type)
 	case ADM_LSM_AUDPROC_PERSISTENT_CAL_TYPE:
 		ret = ADM_LSM_AUDPROC_PERSISTENT_CAL;
 		break;
-	case ADM_AUDPROC_PERSISTENT_CAL_TYPE:
-		ret = ADM_AUDPROC_PERSISTENT_CAL;
-		break;
 	default:
 		pr_err("%s: invalid cal type %d!\n", __func__, cal_type);
 	}
@@ -4149,11 +4125,6 @@ static int adm_init_cal_data(void)
 		cal_utils_match_buf_num} },
 
 		{{ADM_LSM_AUDPROC_PERSISTENT_CAL_TYPE,
-		 {adm_alloc_cal, adm_dealloc_cal, NULL,
-		  adm_set_cal, NULL, NULL} },
-		 {adm_map_cal_data, adm_unmap_cal_data,
-		  cal_utils_match_buf_num} },
-		{{ADM_AUDPROC_PERSISTENT_CAL_TYPE,
 		 {adm_alloc_cal, adm_dealloc_cal, NULL,
 		  adm_set_cal, NULL, NULL} },
 		 {adm_map_cal_data, adm_unmap_cal_data,
@@ -4670,13 +4641,6 @@ int adm_store_cal_data(int port_id, int copp_idx, int path, int perf_mode,
 			goto unlock;
 		}
 	} else if (cal_index == ADM_LSM_AUDPROC_PERSISTENT_CAL) {
-		if (cal_block->cal_data.size > AUD_PROC_PERSIST_BLOCK_SIZE) {
-			pr_err("%s:persist invalid size exp/actual[%zd, %d]\n",
-				__func__, cal_block->cal_data.size, *size);
-			rc = -ENOMEM;
-			goto unlock;
-		}
-	} else if (cal_index == ADM_AUDPROC_PERSISTENT_CAL) {
 		if (cal_block->cal_data.size > AUD_PROC_PERSIST_BLOCK_SIZE) {
 			pr_err("%s:persist invalid size exp/actual[%zd, %d]\n",
 				__func__, cal_block->cal_data.size, *size);

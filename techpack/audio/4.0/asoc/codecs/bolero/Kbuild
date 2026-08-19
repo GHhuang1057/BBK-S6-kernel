@@ -100,7 +100,7 @@ ifdef CONFIG_RX_MACRO
 	RX_OBJS += rx-macro.o
 endif
 
-LINUX_INC +=	-I$(srctree)/include/linux
+LINUX_INC +=	-Iinclude/linux
 
 INCS +=		$(COMMON_INC) \
 		$(UAPI_INC)

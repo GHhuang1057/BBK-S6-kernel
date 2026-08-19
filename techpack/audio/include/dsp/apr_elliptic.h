@@ -2,7 +2,7 @@
 
 #include <linux/types.h>
 #include <dsp/apr_audio-v2.h>
-#include <"../elliptic/elliptic_data_io.h"
+#include <elliptic/elliptic_data_io.h>
 #include <linux/delay.h>
 
 #define ELLIPTIC_SET_PARAMS_SIZE			114
