@@ -21,6 +21,9 @@ jobs:
         with:
           swap-size-gb: 5
 
+      - name: Configure Fast APT Mirror
+        uses: vegardit/fast-apt-mirror.sh@v1
+
       - name: Prepare environment
         run: |
           sudo apt-get update
