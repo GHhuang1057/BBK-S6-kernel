@@ -6898,17 +6898,17 @@ static struct snd_soc_dai_link msm_tasha_fe_dai_links[] = {
 };
 
 #ifdef CONFIG_SND_SOC_AWINIC_AW882XX
-#define AW882XX_SPEAKER_NAME "aw882xx_smartpa.3-0034"
-#define AW882XX_RECEIVER_NAME "aw882xx_smartpa.3-0035"
+#define AW882XX_SPEAKER_NAME "aw882xx_smartpa.2-0034"
+#define AW882XX_RECEIVER_NAME "aw882xx_smartpa.2-0036"
 struct snd_soc_dai_link_component awinic_codecs[] = {
 	{
 		.of_node = NULL,
-		.dai_name = "aw882xx-aif-3-34",
+		.dai_name = "aw882xx-aif-2-34",
 		.name = AW882XX_SPEAKER_NAME,
 	},
 	{
 		.of_node = NULL,
-		.dai_name = "aw882xx-aif-3-35",
+		.dai_name = "aw882xx-aif-2-36",
 		.name = AW882XX_RECEIVER_NAME,
 	},
 };
@@ -8442,9 +8442,6 @@ static struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 	u32 wcn_btfm_intf = 0;
 	const struct of_device_id *match;
 	u32 tasha_codec = 0;
-#ifndef CONFIG_MACH_XIAOMI_VIOLET
-	int hw_platform;
-#endif
 
 	match = of_match_node(sm6150_asoc_machine_of_match, dev->of_node);
 	if (!match) {
