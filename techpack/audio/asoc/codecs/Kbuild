@@ -211,6 +211,8 @@ ifeq ($(KERNEL_BUILD), 1)
 	obj-y	+= wcd937x/
 	obj-y	+= bolero/
 	obj-y	+= awinic/
+	obj-y	+= tfa9874/
+	obj-y	+= dbmdx/
 endif
 
 ifeq ($(CONFIG_SND_SOC_GCOV), y)
